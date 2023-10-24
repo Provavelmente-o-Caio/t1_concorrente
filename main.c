@@ -1,3 +1,5 @@
+// Grupo: Caio Ferreira Cardoso, Gabriel Reimann Cervi, Lucas Brand Martins
+
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
