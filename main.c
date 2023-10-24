@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <unistd.h>
-#include <stdlib.c>
+#include <stdlib.h>
 
 void thread_cliente() {
     while(!fechouBar) {
@@ -37,13 +37,26 @@ int main(int argc, char* argv[]) {
     max_conversa = atoi(argc[5]); // tempo maximo antes de fazer um novo pedido
     max_consumo = atoi(argc[6]); // tempo maximo de consumo de uma bebida
 
-    pthread_t cliente, garcom;
+    pthread_t clientes[n];
+    pthread_t garcons[g];
 
-    pthread_create(&cliente, NULL, thread_cliente, NULL);
-    pthread_create(&garcom, NULL, thread_garcom, NULL);
+    // Criação de Threads
+    for (int i = 0; i < n; i++) {
+        pthread_create(&clientes[i], NULL, thread_cliente, NULL);
+    }
 
-    pthread_join(&cliente);
-    pthread_join(&garcom);
+    for (int i = 0; i < g; i++) {
+        pthread_create(&garcons[g], NULL, thread_garcom, NULL);
+    }
+
+    // Sincronização das Threads
+    for (int i = 0; i < n; i++) {
+        pthread_join(&clientes[i])
+    }
+
+    for (int i = 0; i < g; i++) {
+        pthread_join(&garcons[i])
+    }
 
   return 0;
 }
