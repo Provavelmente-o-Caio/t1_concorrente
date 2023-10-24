@@ -11,8 +11,9 @@ typedef struct {
 typedef struct {
     int id;
     int num_pedido;
-    sem_t sem;
-    cliente_t* fila_clientes;
+    sem_t sem_pedidos;
+    sem_t sem_ativado;
+    cliente_t** fila_clientes;
 } garcom_t;
 
 #endif

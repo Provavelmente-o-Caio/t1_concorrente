@@ -5,10 +5,12 @@
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "structs.h"
 
 extern int n, g, gn, num_rodadas, max_consumo, max_conversa, fechouBar, rodada;
 extern garcom_t** lista_garcons;
+extern pthread_mutex_t mut_pedidos;
 
 void conversaComAmigos(cliente_t* cliente) {
     printf("Cliente %d está conversando com amigos\n", cliente->id);
@@ -21,7 +23,9 @@ void conversaComAmigos(cliente_t* cliente) {
 void fazPedido(cliente_t* cliente) {
     garcom_t* garcom = lista_garcons[rand() % g];
     garcom->fila_clientes[garcom->num_pedido] = cliente;
-    printf("Cliente %d fez o pedido\n", cliente->id);
+    garcom->num_pedido++;
+    sem_post(&garcom->sem_ativado);
+    printf("Cliente %d fez o pedido para o Garçom %d\n", cliente->id, garcom->id);
     fflush(stdout);
 }
 
@@ -32,6 +36,7 @@ void esperaPedido(cliente_t* cliente) {
 }
 
 void recebePedido(cliente_t* cliente) {
+    sem_wait(&cliente->sem);
     printf("Cliente %d recebe o pedido\n", cliente->id);
 }
 
