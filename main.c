@@ -6,7 +6,26 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void thread_cliente() {
+typedef struct {
+    int fechouBar;
+    int rodada;
+    int maxRodadas;
+} bar_t;
+
+typedef struct {
+    int tempoMaxConversa;
+    int tempoMaxConsumo;
+    bar_t* bar;
+} cliente_args_t;
+
+typedef struct {
+    int id;
+    int capacidade;
+    int clientesAtendidos;
+    bar_t* bar;
+} garcom_args_t;
+
+void* thread_cliente(void* arg) {
     while(!fechouBar) {
         conversaComAmigos(); // tempo variavel
         fazPedido();
@@ -16,7 +35,7 @@ void thread_cliente() {
     }
 }
 
-void thread_garcom() {
+void* thread_garcom(void* arg) {
     while(!fechouBar) {
         recebeMaximoPedidos();
         registraPedidos();
@@ -32,33 +51,50 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    n = atoi(argc[1]); // numero clientes
-    g = atoi(argc[2]); // numero garcons
-    gn = atoi(argc[3]); // capacidade de atendimento
-    rodadas = atoi(argc[4]); // numero de rodadas
-    max_conversa = atoi(argc[5]); // tempo maximo antes de fazer um novo pedido
-    max_consumo = atoi(argc[6]); // tempo maximo de consumo de uma bebida
+    int n = atoi(argv[1]); // numero clientes
+    int g = atoi(argv[2]); // numero garcons
+    int gn = atoi(argv[3]); // capacidade de atendimento
+    int rodadas = atoi(argv[4]); // numero de rodadas
+    int max_conversa = atoi(argv[5]); // tempo maximo antes de fazer um novo pedido
+    int max_consumo = atoi(argv[6]); // tempo maximo de consumo de uma bebida
 
-    pthread_t clientes[n];
-    pthread_t garcons[g];
+    pthread_t threads_clientes[n];
+    pthread_t threads_garcons[g];
+
+    bar_t* bar = malloc(sizeof(bar_t));
+    bar->rodada = 0;
+    bar->maxRodadas = rodadas;
+    bar->fechouBar = 0;
+
+    cliente_args_t clientes;
+    clientes.tempoMaxConsumo = max_consumo;
+    clientes.tempoMaxConversa = max_conversa;
+    clientes.bar = bar;
+
+    garcom_args_t garcons[g];
+
+    for (int i = 0; i < g; i++) {
+        garcons[i].id = i;
+        garcons[i].capacidade = gn;
+        garcons[i].clientesAtendidos = 0;
+        garcons[i].bar = bar;
+    }
 
     // Criação de Threads
-    for (int i = 0; i < n; i++) {
-        pthread_create(&clientes[i], NULL, thread_cliente, NULL);
-    }
+    for (int i = 0; i < n; i++)
+        pthread_create(&threads_clientes[i], NULL, thread_cliente, (void*)&clientes);
 
-    for (int i = 0; i < g; i++) {
-        pthread_create(&garcons[g], NULL, thread_garcom, NULL);
-    }
+    for (int i = 0; i < g; i++)
+        pthread_create(&threads_garcons[g], NULL, thread_garcom, (void*)&garcons[i]);
 
     // Sincronização das Threads
-    for (int i = 0; i < n; i++) {
-        pthread_join(&clientes[i])
-    }
+    for (int i = 0; i < n; i++)
+        pthread_join(threads_clientes[i], NULL);
 
-    for (int i = 0; i < g; i++) {
-        pthread_join(&garcons[i])
-    }
+    for (int i = 0; i < g; i++)
+        pthread_join(threads_garcons[i], NULL);
+    
+    free(bar);
 
-  return 0;
+    return 0;
 }
