@@ -22,6 +22,5 @@ O trabalho deverá ser realizado em grupos de 3 alunos e o número máximo de gr
 Os itens para avaliação são: (i) funcionamento do programa; (ii) execução das threads sem ocorrência de deadlocks e/ou outros problemas de sincronização; (iii) saída do programa (de modo a permitir a avaliação de seu funcionamento); (iv) clareza do código (utilização de comentários e nomes de variáveis adequadas); (v) apresentação do trabalho; (vi) qualidade do relatório; (vii) compilação sem warnings; e (viii) sem vazamento de memória.
 
 Durante as apresentações, o professor irá avaliar o conhecimento individual dos alunos sobre os conteúdos teóricos e práticos vistos em aula e sobre a solução adotada no trabalho. A nota atribuída à cada aluno i no trabalho (𝑁𝑜𝑡𝑎𝑇𝑟𝑎𝑏𝑎𝑙ℎ𝑜) será calculada da seguinte forma, onde 𝐴𝑖 é a nota referente à apresentação do aluno i e 𝑆 é a nota atribuída à solução do trabalho:
-$$
-NotaTrabalho_i = \frac{A_i*S}{10}
-$$
+
+NotaTrabalho_i = (A_i*S)/10
