@@ -23,10 +23,10 @@ void registraPedidos(garcom_t* garcom) {
 }
 
 void entregaPedidos(garcom_t* garcom) {
-    for (int i = 0; i < gn; i++) {
-        cliente_t* cliente = garcom->fila_clientes[garcom->num_pedido];
+    for (int i = 0; i < garcom->num_pedido; i++) {
+        cliente_t* cliente = garcom->fila_clientes[i];
         sem_post(&cliente->sem);
-        printf("Garçom %d entregou o pedido do cliente %d", garcom->id, cliente->sem);
+        printf("Garçom %d entregou o pedido do cliente %d\n", garcom->id, cliente->sem);
         garcom->num_pedido--;
     }
 }

@@ -36,7 +36,6 @@ void esperaPedido(cliente_t* cliente) {
 }
 
 void recebePedido(cliente_t* cliente) {
-    sem_wait(&cliente->sem);
     printf("Cliente %d recebe o pedido\n", cliente->id);
 }
 
