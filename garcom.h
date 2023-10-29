@@ -4,31 +4,46 @@
 #include <stdio.h>
 #include "structs.h"
 
-extern int n, g, gn, num_rodadas, max_consumo, max_conversa, fechouBar, rodada;
+extern int n, g, gn, num_rodadas, max_consumo, max_conversa, fechouBar, rodada, rodada_finalizada;
+extern cliente_t** lista_clientes;
+extern garcom_t** lista_garcons;
 
 void recebeMaximoPedidos(garcom_t* garcom) {
-    for (int i = 0; i < gn; i++) {
-        printf("Garçom %d esperando pedido\n", garcom->id);
-        fflush(stdout);
-        sem_wait(&garcom->sem_ativado);
-        sem_wait(&garcom->sem_pedidos);
-        garcom->num_pedido++;
-        printf("Garçom %d recebeu um pedido\n", garcom->id);
-        fflush(stdout);
-    }
+    sem_wait(&garcom->sem);
+    printf("O garçom %d recebeu todos os pedidos\n", garcom->id);
+    fflush(stdout);
 }
 
 void registraPedidos(garcom_t* garcom) {
-
+    printf("O garçom %d registra todos os pedidos\n", garcom->id);
+    fflush(stdout);
 }
 
 void entregaPedidos(garcom_t* garcom) {
-    for (int i = 0; i < garcom->num_pedido; i++) {
-        cliente_t* cliente = garcom->fila_clientes[i];
-        sem_post(&cliente->sem);
-        printf("Garçom %d entregou o pedido do cliente %d\n", garcom->id, cliente->sem);
-        garcom->num_pedido--;
+    for (int i = 0; i < gn; i++) {
+        for (int j = 0; j < n; j++) {
+            cliente_t* cliente = lista_clientes[j];
+            if (garcom->fila_clientes[i] == cliente->id) {
+                sem_post(&cliente->sem);
+                printf("Garçom %d entregou o pedido do cliente %d\n", garcom->id, cliente->id);
+                fflush(stdout);
+                --garcom->num_pedido;
+                garcom->fila_clientes[i] = -1;
+            }
+        }
     }
+    garcom->terminou_rodada = 1;
+}
+
+int verificaSeRodadaTerminou() {
+    int verificacao = 1;
+    for (int i = 0; i < g; i++) {
+        garcom_t* garcom = lista_garcons[i];
+        if (garcom->terminou_rodada == 0) {
+            verificacao = 0;
+        }
+    }
+    return verificacao;
 }
 
 #endif
