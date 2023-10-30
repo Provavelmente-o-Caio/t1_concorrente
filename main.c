@@ -75,6 +75,10 @@ int main(int argc, char* argv[]) {
         garcom->terminou_rodada = 0;
         sem_init(&garcom->sem, 0, 0);
         garcom->fila_clientes = (int*)malloc(gn*sizeof(int));
+        // não tenho certeza se isso será realmente útil, mas parece resolver a questão de o cliente 0 ser servido varias vezes
+        for (int i = 0; i < gn; i++) {
+          garcom->fila_clientes[i] = -1;
+        }
         lista_garcons[i] = garcom;
     }
 
