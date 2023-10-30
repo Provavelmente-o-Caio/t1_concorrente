@@ -26,7 +26,7 @@ void fazPedido(cliente_t* cliente) {
     } while(garcom->num_pedido >= gn);
     garcom->fila_clientes[garcom->num_pedido] = cliente->id;
     garcom->num_pedido++;
-    if (garcom->num_pedido == gn)
+    if (garcom->num_pedido < gn)
         sem_post(&garcom->sem);
     printf("Cliente %d fez o pedido para o Garçom %d\n", cliente->id, garcom->id);
     fflush(stdout);
