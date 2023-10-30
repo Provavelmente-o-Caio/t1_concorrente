@@ -24,10 +24,10 @@ void entregaPedidos(garcom_t* garcom) {
         for (int j = 0; j < n; j++) {
             cliente_t* cliente = lista_clientes[j];
             if (garcom->fila_clientes[i] == cliente->id) {
-                sem_post(&cliente->sem);
                 printf("Garçom %d entregou o pedido do cliente %d\n", garcom->id, cliente->id);
                 fflush(stdout);
-                --garcom->num_pedido;
+                sem_post(&cliente->sem);
+                garcom->num_pedido--;
                 garcom->fila_clientes[i] = -1;
             }
         }

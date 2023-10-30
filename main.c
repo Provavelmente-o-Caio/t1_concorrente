@@ -13,8 +13,8 @@
 
 int n, g, gn, num_rodadas, max_consumo, max_conversa;
 int fechouBar = 0;
+int iniciouRodada = 0;
 int rodada = 0;
-int rodada_finalizada = 0;
 garcom_t** lista_garcons = NULL;
 cliente_t** lista_clientes = NULL;
 pthread_mutex_t mut_rodada;
@@ -35,12 +35,20 @@ void* thread_cliente(void* arg) {
 void* thread_garcom(void* arg) {
     garcom_t* garcom = (garcom_t*) arg;
     while(!fechouBar) {
+        pthread_mutex_lock(&mut_rodada);
+        if (iniciouRodada == 0) {
+            printf("Rodada: %d\n", rodada); // serve como parâmetro para fechar o bar
+            iniciouRodada = 1;
+        }
+        pthread_mutex_unlock(&mut_rodada);
+
         recebeMaximoPedidos(garcom);
         registraPedidos(garcom);
         entregaPedidos(garcom);
-        rodada_finalizada = verificaSeRodadaTerminou();
+
         pthread_mutex_lock(&mut_rodada);
         rodada++; // serve como parâmetro para fechar o bar
+        iniciouRodada = 0;
         pthread_mutex_unlock(&mut_rodada);
         if (rodada == num_rodadas)
             fechouBar = 1;
@@ -59,7 +67,8 @@ int main(int argc, char* argv[]) {
     num_rodadas = atoi(argv[4]); // numero de rodadas
     max_conversa = atoi(argv[5]); // tempo maximo antes de fazer um novo pedido
     max_consumo = atoi(argv[6]); // tempo maximo de consumo de uma bebida
-    
+
+
     pthread_t threads_clientes[n];
     pthread_t threads_garcons[g];
 
@@ -75,10 +84,6 @@ int main(int argc, char* argv[]) {
         garcom->terminou_rodada = 0;
         sem_init(&garcom->sem, 0, 0);
         garcom->fila_clientes = (int*)malloc(gn*sizeof(int));
-        // não tenho certeza se isso será realmente útil, mas parece resolver a questão de o cliente 0 ser servido varias vezes
-        for (int i = 0; i < gn; i++) {
-          garcom->fila_clientes[i] = -1;
-        }
         lista_garcons[i] = garcom;
     }
 
