@@ -122,13 +122,13 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < n; i++) {
         pthread_join(threads_clientes[i], NULL);
         sem_destroy(&lista_clientes[i]->sem);
-        free(lista_garcons[i]->fila_clientes);
         free(lista_clientes[i]);
     }
 
     for (int i = 0; i < g; i++) {
         pthread_join(threads_garcons[i], NULL);
         sem_destroy(&lista_garcons[i]->sem);
+        free(lista_garcons[i]->fila_clientes);
         free(lista_garcons[i]);
     }
 
