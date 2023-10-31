@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
     max_consumo = atoi(argv[6]); // tempo maximo de consumo de uma bebida
 
     if (n%(gn*g) != 0 || n < (gn*g)) {
-        printf("O numero de clientes deve ser maior ou igual e mutliplo da capacidade de cada garçom vezes o número de garçons");
+        printf("O numero de clientes deve ser maior ou igual e mutliplo da capacidade de cada garçom vezes o número de garçons\n");
         fflush(stdout);
         return 1;
     }
