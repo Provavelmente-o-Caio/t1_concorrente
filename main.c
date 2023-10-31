@@ -32,6 +32,7 @@ void* thread_cliente(void* arg) {
         if (rodada == num_rodadas)
             fechouBar = 1;
     }
+    pthread_exit(NULL);
 }
 
 void* thread_garcom(void* arg) {
@@ -56,6 +57,7 @@ void* thread_garcom(void* arg) {
         if (rodada == num_rodadas)
             fechouBar = 1;
     }
+    pthread_exit(NULL);
 }
 
 int main(int argc, char* argv[]) {
