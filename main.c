@@ -122,6 +122,7 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < n; i++) {
         pthread_join(threads_clientes[i], NULL);
         sem_destroy(&lista_clientes[i]->sem);
+        free(lista_garcons[i]->fila_clientes);
         free(lista_clientes[i]);
     }
 
@@ -132,6 +133,8 @@ int main(int argc, char* argv[]) {
     }
 
     pthread_mutex_destroy(&mut_rodada);
+    free(lista_garcons);
+    free(lista_clientes);
 
     return 0;
 }
