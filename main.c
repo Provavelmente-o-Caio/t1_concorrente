@@ -46,15 +46,13 @@ void* thread_garcom(void* arg) {
         recebeMaximoPedidos(garcom);
         registraPedidos(garcom);
         entregaPedidos(garcom);
-
+        rodada_finalizada = verificaSeRodadaTerminou();
         if (rodada_finalizada) {
             pthread_mutex_lock(&mut_rodada);
             rodada++;
+            iniciouRodada = 0;
             pthread_mutex_unlock(&mut_rodada);
         }
-        pthread_mutex_lock(&mut_rodada);
-        rodada++; // serve como parâmetro para fechar o bar
-        pthread_mutex_unlock(&mut_rodada);
         if (rodada == num_rodadas)
             fechouBar = 1;
     }
