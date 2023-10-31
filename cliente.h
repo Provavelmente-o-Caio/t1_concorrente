@@ -22,11 +22,11 @@ void conversaComAmigos(cliente_t* cliente) {
 void fazPedido(cliente_t* cliente) {
     garcom_t* garcom;
     do {
-        garcom = lista_garcons[rand() % g];
+        garcom = lista_garcons[rand() % g]; // Procura um garçom livre para o pedido
     } while(garcom->num_pedido >= gn);
-    garcom->fila_clientes[garcom->num_pedido] = cliente->id;
-    garcom->num_pedido++;
-    if (garcom->num_pedido == gn)
+    garcom->fila_clientes[garcom->num_pedido] = cliente->id; // Adiciona o cliente na fila de atendimento
+    garcom->num_pedido++; 
+    if (garcom->num_pedido == gn) // Libera o garçom se ele estiver com o número máximo de pedidos
         sem_post(&garcom->sem);
     printf("Cliente %d fez o pedido para o Garçom %d\n", cliente->id, garcom->id);
     fflush(stdout);
@@ -35,7 +35,7 @@ void fazPedido(cliente_t* cliente) {
 void esperaPedido(cliente_t* cliente) {
     printf("Cliente %d espera o pedido\n", cliente->id);
     fflush(stdout);
-    sem_wait(&cliente->sem);
+    sem_wait(&cliente->sem); // Espera receber seu pedido
 }
 
 void recebePedido(cliente_t* cliente) {
