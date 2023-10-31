@@ -19,7 +19,7 @@ typedef struct {
 
 typedef struct {
     int rodadas;
-    Queue fila_clientes;
+    int* fila_clientes;
 } bar_t;
 
 

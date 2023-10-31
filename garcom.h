@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include "structs.h"
-#include "fila.h"
 
 extern int n, g, gn, num_rodadas, max_consumo, max_conversa, fechouBar, rodada, rodada_finalizada;
 extern cliente_t** lista_clientes;

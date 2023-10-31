@@ -10,7 +10,6 @@
 #include "structs.h"
 #include "cliente.h"
 #include "garcom.h"
-#include "fila.h"
 
 int n, g, gn, num_rodadas, max_consumo, max_conversa;
 int fechouBar = 0;
@@ -31,14 +30,12 @@ void* thread_cliente(void* arg) {
         esperaPedido(cliente);
         recebePedido(cliente);
         consomePedido(cliente); // tempo variavel
-        if (rodada == num_rodadas)
-            fechouBar = 1;
     }
 }
 
 void* thread_garcom(void* arg) {
     garcom_t* garcom = (garcom_t*) arg;
-    bar_t* 
+    bar_t*
     while(!fechouBar) {
         recebeMaximoPedidos(garcom);
         registraPedidos(garcom);
@@ -47,14 +44,15 @@ void* thread_garcom(void* arg) {
 }
 
 void* thread_bar(bar_t* bar){
-    while(1) {
+    printf("Rodada: %d\n",bar->rodadas);
+    while(!fechouBar) {
         if (bar->rodadas == num_rodadas) {
-            //todo: encerra tudo
+            fechouBar = 1;
         }
         if (verificaSeRodadaTerminou())
             bar->rodadas++;
+            printf("Rodada: %d\n",bar->rodadas);
     }
-
 }
 
 int main(int argc, char* argv[]) {
@@ -79,12 +77,11 @@ int main(int argc, char* argv[]) {
     srand(time(NULL));
 
     lista_garcons = (garcom_t**) malloc(g*sizeof(garcom_t));
-    Queue* fila_clientes_bar = (Queue*)malloc(sizeof(Queue));
-    initialize(fila_clientes_bar);
+    lista_clientes = (cliente_t**) malloc(n*sizeof(cliente_t));
 
     bar_t bar;
     bar.rodadas = 0;
-    bar.fila_clientes = fila_clientes_bar;
+    bar.fila_clientes = lista_clientes;
 
     for (int i = 0; i < g; i++) {
         garcom_t* garcom = malloc(sizeof(garcom_t));
@@ -105,10 +102,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Criação de Threads
+    pthread_create(&thread_bar, NULL, thread_bar, (void*)bar);
+
     for (int i = 0; i < n; i++)
         pthread_create(&threads_clientes[i], NULL, thread_cliente, (void*)lista_clientes[i]);
 
-    pthread_create(&thread_bar, NULL, thread_bar, (void*)lista_clientes[i]);
 
     for (int i = 0; i < g; i++)
         pthread_create(&threads_garcons[i], NULL, thread_garcom, (void*)lista_garcons[i]);
