@@ -14,6 +14,7 @@
 int n, g, gn, num_rodadas, max_consumo, max_conversa;
 int fechouBar = 0;
 int rodada = 0;
+int iniciouRodada = 0;
 int rodada_finalizada = 0;
 garcom_t** lista_garcons = NULL;
 cliente_t** lista_clientes = NULL;
@@ -35,12 +36,20 @@ void* thread_cliente(void* arg) {
 void* thread_garcom(void* arg) {
     garcom_t* garcom = (garcom_t*) arg;
     while(!fechouBar) {
+        pthread_mutex_lock(&mut_rodada);
+        if (iniciouRodada == 0) {
+            printf("Rodada: %d\n", rodada); // serve como parâmetro para fechar o bar
+            iniciouRodada = 1;
+        }
+        pthread_mutex_unlock(&mut_rodada);
+
         recebeMaximoPedidos(garcom);
         registraPedidos(garcom);
         entregaPedidos(garcom);
-        rodada_finalizada = verificaSeRodadaTerminou();
+
         pthread_mutex_lock(&mut_rodada);
         rodada++; // serve como parâmetro para fechar o bar
+        iniciouRodada = 0;
         pthread_mutex_unlock(&mut_rodada);
         if (rodada == num_rodadas)
             fechouBar = 1;
@@ -87,13 +96,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Criação de Threads
-    for (int i = 0; i < n; i++)
-        pthread_create(&threads_clientes[i], NULL, thread_cliente, (void*)lista_clientes[i]);
-
-
     for (int i = 0; i < g; i++)
         pthread_create(&threads_garcons[i], NULL, thread_garcom, (void*)lista_garcons[i]);
 
+    for (int i = 0; i < n; i++)
+        pthread_create(&threads_clientes[i], NULL, thread_cliente, (void*)lista_clientes[i]);
 
     // Sincronização das Threads
     for (int i = 0; i < n; i++) {
