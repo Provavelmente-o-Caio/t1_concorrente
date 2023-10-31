@@ -8,7 +8,7 @@
     #endif /*__deprecated*/
 
     #define __deprecated
-    #include </usr/include/semaphore.h>
+    #include <>
     #undef __deprecated
     
     #ifdef OLD_DEPRECATED
@@ -48,7 +48,6 @@
     
 #else
     
-    #include </usr/include/semaphore.h>
     
 #endif /*__APPLE__*/
 #endif /*__INE5410_SEMAPHORE_H__*/
