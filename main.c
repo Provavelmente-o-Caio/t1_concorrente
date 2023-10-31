@@ -27,6 +27,7 @@ void* thread_cliente(void* arg) {
         esperaPedido(cliente);
         recebePedido(cliente);
         consomePedido(cliente); // tempo variavel
+        while(!rodada_finalizada);
         if (rodada == num_rodadas)
             fechouBar = 1;
     }
@@ -38,13 +39,12 @@ void* thread_garcom(void* arg) {
         recebeMaximoPedidos(garcom);
         registraPedidos(garcom);
         entregaPedidos(garcom);
+        pthread_mutex_lock(&mut_rodada);
         rodada_finalizada = verificaSeRodadaTerminou();
         if (rodada_finalizada) {
-            pthread_mutex_lock(&mut_rodada);
             rodada++;
-            pthread_mutex_unlock(&mut_rodada);
         }
-        pthread_mutex_lock(&mut_rodada);
+        pthread_mutex_unlock(&mut_rodada);
         if (rodada == num_rodadas)
             fechouBar = 1;
     }
@@ -55,6 +55,14 @@ int main(int argc, char* argv[]) {
         printf("Uso: %s [clientes] [garcons] [clientes/garcons] [rodadas] [max_conversa] [max_consumo]\n", argv[0]);
         return 1;
     }
+    
+    for (int i = 1; i <= 6; i++) {
+        if(atoi(argv[i]) <= 0) {
+            printf("Todos os números precisam ser maior que 0\n");
+            fflush(stdout);
+            return 1;
+        }
+    }
 
     n = atoi(argv[1]); // numero clientes
     g = atoi(argv[2]); // numero garcons
@@ -62,6 +70,12 @@ int main(int argc, char* argv[]) {
     num_rodadas = atoi(argv[4]); // numero de rodadas
     max_conversa = atoi(argv[5]); // tempo maximo antes de fazer um novo pedido
     max_consumo = atoi(argv[6]); // tempo maximo de consumo de uma bebida
+
+    if (n%(gn*g) != 0 || n < (gn*g)) {
+        printf("O numero de clientes deve ser maior ou igual e mutliplo da capacidade de cada garçom vezes o número de garçons");
+        fflush(stdout);
+        return 1;
+    }
     
     pthread_t threads_clientes[n];
     pthread_t threads_garcons[g];
@@ -102,11 +116,13 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < n; i++) {
         pthread_join(threads_clientes[i], NULL);
         sem_destroy(&lista_clientes[i]->sem);
+        free(lista_clientes[i]);
     }
 
     for (int i = 0; i < g; i++) {
         pthread_join(threads_garcons[i], NULL);
         sem_destroy(&lista_garcons[i]->sem);
+        free(lista_garcons[i]);
     }
 
     pthread_mutex_destroy(&mut_rodada);
